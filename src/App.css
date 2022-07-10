@@ -9,12 +9,12 @@
 }
 
 .card {
-  background-color: #202231;
   font-size: 30px;
   height: 300px;
-  border-radius: 15px;
-  box-shadow: 0px 0px 5px black;
   padding-left: 30px;
+  border-radius: 15px;
+  margin: 10px;
+  background-color: #202231;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
@@ -23,10 +23,11 @@
 
 .control-panel {
   background-color: #161522;
-  border-radius: 15px;
+  border-radius: 50px;
   box-shadow: 0px 0px 5px black;
+  margin: 3px;
   height: 100px;
-  width: 250px;
+  width: 240px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -36,6 +37,10 @@
 .container > div.card-container {
   font-family: 'Electrolize';
   color: white;
+  background-color: #101018;
+  border-radius: 15px;
+  box-shadow: 0px 0px 5px black;
+  padding: 15px;
   width: 500px;
   margin: 50px;
   transition: top 0.2s, left 0.5s;
