@@ -37,6 +37,14 @@ function App() {
   // }, []);
 
 
+  const games = [...Array(100).keys()].map((n) => <GameCard 
+    key={`${n}`}
+    numberOfPlayers={101}
+    ethToEnter={5}
+    linkToEnter={0.25}
+  />);
+
+
   useEffect(() => {
 
     const nodes = document.querySelectorAll(".card-node");
@@ -77,7 +85,7 @@ function App() {
       className="App"
     >
       <div className="container">
-        {[...Array(100).keys()].map((n) => <GameCard key={`${n}`}/>)}
+        {games}
       </div>
     </div>
   );

@@ -3,16 +3,20 @@
 }
 
 .container > div.card {
+  font-family: 'Ubuntu';
+  font-size: 30px;
   width: 500px;
   height: 300px;
   border: 0;
   border-radius: 15px;
   background-color: white;
   display: flex;
-  box-shadow: 0px 0px 8px black;
-  align-items: center;
-  justify-content: center;
-  margin: 10px;
+  flex-direction: column;
+  box-shadow: 0px 0px 5px black;
+  justify-content: space-around;
+  align-items: flex-start;
+  padding-left: 30px;
+  margin: 50px;
   transition: top 0.2s, left 0.5s;
 }
 
@@ -21,7 +25,6 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  border: 10px solid red;
 }
 
 .container > div.card-node {
