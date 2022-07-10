@@ -1,10 +1,15 @@
 import React from 'react';
-import {Box} from '@mui/material';
 import '../App.css';
 import {GameCard} from './GameCard'
 
 
 export function GameCardContainer(props) {
+
+    function logMessage() {
+        console.log('click');
+    }
+
+
     return (
         <div className="card-container card-container-node">
             <GameCard 
@@ -12,24 +17,23 @@ export function GameCardContainer(props) {
                 ethToEnter={props.ethToEnter}
                 linkToEnter={props.linkToEnter}
             />
-            <div className="button-list">
-                <Box className="control-panel">
+            <div className="button-list" id="button-list">
+                <div className="control-panel" id="deposit-eth">
                     <img src={require("../images/eth-icon.png")} height={50} width={50} margin={"25px"}></img>
                     <span style={{paddingLeft: "20px"}}>Deposit ETH</span>
-                </Box>
-                <Box className="control-panel">
+                </div>
+                <div className="control-panel" id="withdraw-eth">
                     <img src={require("../images/eth-icon.png")} height={50} width={50}></img>
                     <span style={{paddingLeft: "20px"}}>Withdraw ETH</span>
-                </Box>
-                <Box className="control-panel">
+                </div>
+                <div className="control-panel" id="deposit-link">
                     <img src={require("../images/chainlink-icon.png")} height={50} width={50}></img>
                     <span style={{paddingLeft: "20px"}}>Deposit LINK</span>
-                </Box>
-                <Box className="control-panel">
+                </div>
+                <div className="control-panel" id="withdraw-link">
                     <img src={require("../images/chainlink-icon.png")} height={50} width={50}></img>
                     <span style={{paddingLeft: "20px"}}>Withdraw LINK</span>
-                </Box>
-
+                </div>
             </div>
         </div>
     );

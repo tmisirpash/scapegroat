@@ -34,7 +34,7 @@
   font-size: 20px;
 }
 
-.container > div.card-container {
+.card-container {
   font-family: 'Electrolize';
   color: white;
   background-color: #101018;
@@ -53,11 +53,11 @@
   justify-content: center;
 }
 
-.container > div.card-container-node {
+.card-container-node {
   visibility: hidden;
 }
 
-.container > div.card-container-dupe {
+.card-container-dupe {
   position: absolute;
   visibility: visible;
 }

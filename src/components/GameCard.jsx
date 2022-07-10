@@ -16,7 +16,7 @@ export function getReward(numberOfPlayers, ethToEnter) {
 
 export function GameCard(props) {
     return (
-        <Box className="card">
+        <div className="card" onClick={(event) => console.log('click')}>
             <div>
                 Max # of players: <span style={{color: "deepskyblue"}}>{props.numberOfPlayers}</span>
             </div>
@@ -30,6 +30,6 @@ export function GameCard(props) {
                 <span style={{color: "deepskyblue"}}>{getReward(props.numberOfPlayers, props.ethToEnter)}</span> ETH reward
             </div>
 
-        </Box>
+        </div>
     );
 }

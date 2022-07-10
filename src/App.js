@@ -3,6 +3,7 @@ import './App.css';
 import {ethers} from 'ethers';
 import { useEffect, useState, useMemo } from 'react';
 import { GameCardContainer } from './components/GameCardContainer';
+import {React} from 'react';
 
 import linkABI from './artifacts/@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol/LinkTokenInterface.json';
 
@@ -36,12 +37,15 @@ function App() {
   //   getLinkBalance;
   // }, []);
 
+ 
+
 
   const games = [...Array(5).keys()].map((n) => <GameCardContainer 
     key={`${n}`}
     numberOfPlayers={101}
     ethToEnter={5}
     linkToEnter={0.25}
+    onClick={() => console.log('click')}
   />);
 
 
@@ -55,13 +59,27 @@ function App() {
 
     for (nodeCnt = 0; nodeCnt < totalNodes; nodeCnt++) {
       node = nodes[nodeCnt];
+      console.log(node)
 
       dupe = node.cloneNode(true);
+
+      //Add event listeners to buttons (definitely better way to do this)
+      let deposit_eth_node = dupe.querySelector("#button-list").querySelector("#deposit-eth")
+      let withdraw_eth_node = dupe.querySelector("#button-list").querySelector("#withdraw-eth")
+      let deposit_link_node = dupe.querySelector("#button-list").querySelector("#deposit-link")
+      let withdraw_link_node = dupe.querySelector("#button-list").querySelector("#withdraw-link")
+
+      deposit_eth_node.addEventListener("click", () => console.log("click"))
+      withdraw_eth_node.addEventListener("click", () => console.log("click"))
+      deposit_link_node.addEventListener("click", () => console.log("click"))
+      withdraw_link_node.addEventListener("click", () => console.log("click"))
+
+
       dupe.classList.remove('card-container-node');
       dupe.classList.add('card-container-dupe');
       node.parentNode.appendChild(dupe);
-      dupe.style.top = node.offsetTop + 'px';
-      dupe.style.left = node.offsetLeft + 'px';
+      dupe.style.top = node.offsetTop - 50 + 'px';
+      dupe.style.left = node.offsetLeft  - 50 + 'px';
 
       boxes[nodeCnt] = {node, dupe};
     }
@@ -70,8 +88,8 @@ function App() {
       clearTimeout(resizeWaitID);
       resizeWaitID = setTimeout(() => {
         for (nodeCnt = 0; nodeCnt < totalNodes; nodeCnt++) {
-          boxes[nodeCnt].dupe.style.left = boxes[nodeCnt].node.offsetLeft + 'px';
-          boxes[nodeCnt].dupe.style.top = boxes[nodeCnt].node.offsetTop + 'px';
+          boxes[nodeCnt].dupe.style.left = boxes[nodeCnt].node.offsetLeft - 50 + 'px';
+          boxes[nodeCnt].dupe.style.top = boxes[nodeCnt].node.offsetTop - 50 + 'px';
         }
       }, 101);
     }
@@ -84,7 +102,7 @@ function App() {
     <div 
       className="App"
     >
-      <div className="container">
+      <div className="container" style={{position: "absolute"}}>
         {games}
       </div>
     </div>
