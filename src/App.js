@@ -2,7 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import {ethers} from 'ethers';
 import { useEffect, useState, useMemo } from 'react';
-import { GameCard } from './components/GameCard';
+import { GameCardContainer } from './components/GameCardContainer';
 
 import linkABI from './artifacts/@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol/LinkTokenInterface.json';
 
@@ -37,7 +37,7 @@ function App() {
   // }, []);
 
 
-  const games = [...Array(100).keys()].map((n) => <GameCard 
+  const games = [...Array(5).keys()].map((n) => <GameCardContainer 
     key={`${n}`}
     numberOfPlayers={101}
     ethToEnter={5}
@@ -47,7 +47,7 @@ function App() {
 
   useEffect(() => {
 
-    const nodes = document.querySelectorAll(".card-node");
+    const nodes = document.querySelectorAll(".card-container-node");
     const totalNodes = nodes.length;
     const boxes = [];
 
@@ -57,8 +57,8 @@ function App() {
       node = nodes[nodeCnt];
 
       dupe = node.cloneNode(true);
-      dupe.classList.remove('card-node');
-      dupe.classList.add('card-dupe');
+      dupe.classList.remove('card-container-node');
+      dupe.classList.add('card-container-dupe');
       node.parentNode.appendChild(dupe);
       dupe.style.top = node.offsetTop + 'px';
       dupe.style.left = node.offsetLeft + 'px';

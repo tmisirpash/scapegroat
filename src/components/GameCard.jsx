@@ -16,18 +16,18 @@ export function getReward(numberOfPlayers, ethToEnter) {
 
 export function GameCard(props) {
     return (
-        <Box className="card card-node">
+        <Box className="card">
             <div>
-                Max # of players: <span style={{color: "red"}}>{props.numberOfPlayers}</span>
+                Max # of players: <span style={{color: "magenta"}}>{props.numberOfPlayers}</span>
             </div>
             <div>
-                <span style={{color: "green"}}>{props.ethToEnter}</span> ETH, <span style={{color: "blue"}}>{props.linkToEnter}</span> LINK to enter
+                <span style={{color: "deepskyblue"}}>{props.ethToEnter}</span> ETH, <span style={{color: "deepskyblue"}}>{props.linkToEnter}</span> LINK to enter
             </div>
             <div>
-                <span style={{color: "purple"}}>{getProbabilityOfWinning(props.numberOfPlayers)} %</span> chance of winning
+                <span style={{color: "yellow"}}>{getProbabilityOfWinning(props.numberOfPlayers)}%</span> chance of winning
             </div>
             <div>
-                <span style={{color: "green"}}>{getReward(props.numberOfPlayers, props.ethToEnter)}</span> ETH reward
+                <span style={{color: "deepskyblue"}}>{getReward(props.numberOfPlayers, props.ethToEnter)}</span> ETH reward
             </div>
 
         </Box>
