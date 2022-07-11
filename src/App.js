@@ -1,7 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import {ethers} from 'ethers';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { GameCardContainer } from './components/GameCardContainer';
 import {React} from 'react';
 
@@ -36,74 +36,89 @@ function App() {
   //   getBalance();
   //   getLinkBalance;
   // }, []);
+  const num_elements = 100;
+  const [games, setGames] = useState([]);
+  const gridPoints = [...Array(num_elements).keys()];
+  let resizeWaitID = 0;
+  
 
- 
+  useEffect(() => {
 
+    const newCoords = [...document.querySelectorAll('.card-container-node')]
+      .map((node) => {
+        return {
+          top: node.offsetTop -50 + 'px',
+          left: node.offsetLeft -50 + 'px',
+        }
+    });
 
-  const games = [...Array(5).keys()].map((n) => <GameCardContainer 
-    key={`${n}`}
-    numberOfPlayers={101}
-    ethToEnter={5}
-    linkToEnter={0.25}
-    onClick={() => console.log('click')}
-  />);
+    const initialGames = [...Array(num_elements).keys()].map((n, i) => {
+      return { 
+        key: `${n}`,
+        numberOfPlayers: 101,
+        ethToEnter: 5,
+        linkToEnter: 0.25,
+        top: newCoords[i].top,
+        left: newCoords[i].left,
+      }
+    });
+
+    setGames(oldArray => {
+      return initialGames
+    });
+
+  }, []);
 
 
   useEffect(() => {
 
-    const nodes = document.querySelectorAll(".card-container-node");
-    const totalNodes = nodes.length;
-    const boxes = [];
-
-    let nodeCnt = 0, resizeWaitID = 0, node = {}, dupe = {};
-
-    for (nodeCnt = 0; nodeCnt < totalNodes; nodeCnt++) {
-      node = nodes[nodeCnt];
-      console.log(node)
-
-      dupe = node.cloneNode(true);
-
-      //Add event listeners to buttons (definitely better way to do this)
-      let deposit_eth_node = dupe.querySelector("#button-list").querySelector("#deposit-eth")
-      let withdraw_eth_node = dupe.querySelector("#button-list").querySelector("#withdraw-eth")
-      let deposit_link_node = dupe.querySelector("#button-list").querySelector("#deposit-link")
-      let withdraw_link_node = dupe.querySelector("#button-list").querySelector("#withdraw-link")
-
-      deposit_eth_node.addEventListener("click", () => console.log("click"))
-      withdraw_eth_node.addEventListener("click", () => console.log("click"))
-      deposit_link_node.addEventListener("click", () => console.log("click"))
-      withdraw_link_node.addEventListener("click", () => console.log("click"))
-
-
-      dupe.classList.remove('card-container-node');
-      dupe.classList.add('card-container-dupe');
-      node.parentNode.appendChild(dupe);
-      dupe.style.top = node.offsetTop - 50 + 'px';
-      dupe.style.left = node.offsetLeft  - 50 + 'px';
-
-      boxes[nodeCnt] = {node, dupe};
-    }
-
-    function moveNodes() {
+    function moveCards (){
       clearTimeout(resizeWaitID);
       resizeWaitID = setTimeout(() => {
-        for (nodeCnt = 0; nodeCnt < totalNodes; nodeCnt++) {
-          boxes[nodeCnt].dupe.style.left = boxes[nodeCnt].node.offsetLeft - 50 + 'px';
-          boxes[nodeCnt].dupe.style.top = boxes[nodeCnt].node.offsetTop - 50 + 'px';
-        }
-      }, 101);
-    }
+          const newCoords = [...document.querySelectorAll('.card-container-node')]
+            .map((node) => {
+              return {
+                top: node.offsetTop -50 + 'px',
+                left: node.offsetLeft -50 + 'px',
+              }
+            });
+          const updated = games.map((g, i) => {
+            return {
+              key: g.key,
+              numberOfPlayers: g.numberOfPlayers,
+              ethToEnter: g.ethToEnter,
+              linkToEnter: g.linkToEnter,
+              top: newCoords[i].top,
+              left: newCoords[i].left,
+            }
+          });
+          setGames(oldArray => updated);
 
-    window.addEventListener("resize", moveNodes);
-  });
+        }, 101);
+    };
+
+    window.addEventListener("resize", moveCards);
+  })
+
+
 
 
   return (
     <div 
       className="App"
     >
-      <div className="container" style={{position: "absolute"}}>
-        {games}
+      <div className="container">
+        {gridPoints.map((n) => <div key={`${n}`} className="card-container-node"></div>)}
+      </div>
+      <div>
+        {games.map((g) => <GameCardContainer 
+          key={`${g.key}`}
+          numberOfPlayers={g.numberOfPlayers} 
+          ethToEnter={g.ethToEnter} 
+          linkToEnter={g.linkToEnter} 
+          top={g.top} 
+          left={g.left} 
+          position={"absolute"}/>)}
       </div>
     </div>
   );

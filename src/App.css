@@ -51,9 +51,13 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
+  position: absolute;
 }
 
 .card-container-node {
+  width: 500px;
+  margin: 50px;
+  height: 540px;
   visibility: hidden;
 }
 
@@ -61,7 +65,6 @@
   position: absolute;
   visibility: visible;
 }
-
 
 
 

@@ -9,9 +9,8 @@ export function GameCardContainer(props) {
         console.log('click');
     }
 
-
     return (
-        <div className="card-container card-container-node">
+        <div className="card-container" style={{position: props.position, left: props.left, top: props.top}}>
             <GameCard 
                 numberOfPlayers={props.numberOfPlayers}
                 ethToEnter={props.ethToEnter}
