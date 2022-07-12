@@ -1,13 +1,10 @@
 import React from 'react';
 import '../App.css';
 import {GameCard} from './GameCard'
+import {CardButton} from './CardButton'
 
 
 export function GameCardContainer(props) {
-
-    function logMessage() {
-        console.log('click');
-    }
 
     return (
         <div className="card-container" style={{position: props.position, left: props.left, top: props.top}}>
@@ -16,23 +13,29 @@ export function GameCardContainer(props) {
                 ethToEnter={props.ethToEnter}
                 linkToEnter={props.linkToEnter}
             />
-            <div className="button-list" id="button-list">
-                <div className="control-panel" id="deposit-eth">
-                    <img src={require("../images/eth-icon.png")} height={50} width={50} margin={"25px"}></img>
-                    <span style={{paddingLeft: "20px"}}>Deposit ETH</span>
-                </div>
-                <div className="control-panel" id="withdraw-eth">
-                    <img src={require("../images/eth-icon.png")} height={50} width={50}></img>
-                    <span style={{paddingLeft: "20px"}}>Withdraw ETH</span>
-                </div>
-                <div className="control-panel" id="deposit-link">
-                    <img src={require("../images/chainlink-icon.png")} height={50} width={50}></img>
-                    <span style={{paddingLeft: "20px"}}>Deposit LINK</span>
-                </div>
-                <div className="control-panel" id="withdraw-link">
-                    <img src={require("../images/chainlink-icon.png")} height={50} width={50}></img>
-                    <span style={{paddingLeft: "20px"}}>Withdraw LINK</span>
-                </div>
+            <div className="button-list">
+                <CardButton 
+                    img={require("../images/eth-icon.png")} 
+                    text={"Deposit ETH"}
+                    fontSize={20}
+                />
+                <CardButton 
+                    img={require("../images/chainlink-icon.png")}
+                    text={"Deposit LINK"}
+                    fontSize={19.5}
+                />
+
+                <CardButton 
+                    img={require("../images/eth-icon.png")}
+                    text={"Withdraw ETH"}
+                    style={{fontSize: "5px"}}
+                    fontSize={17}
+                />
+                <CardButton 
+                    img={require("../images/chainlink-icon.png")}
+                    text={"Withdraw LINK"}
+                    fontSize={17}
+                />
             </div>
         </div>
     );
