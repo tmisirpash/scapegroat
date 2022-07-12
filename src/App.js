@@ -48,7 +48,7 @@ function App() {
       .map((node) => {
         return {
           top: node.offsetTop -50 + 'px',
-          left: node.offsetLeft -65 + 'px',
+          left: node.offsetLeft - 90 + 'px',
         }
     });
 
@@ -79,7 +79,7 @@ function App() {
             .map((node) => {
               return {
                 top: node.offsetTop -50 + 'px',
-                left: node.offsetLeft -65 + 'px',
+                left: node.offsetLeft -90 + 'px',
               }
             });
           const updated = games.map((g, i) => {
