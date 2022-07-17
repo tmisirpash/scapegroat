@@ -4,6 +4,7 @@ import {ethers} from 'ethers';
 import { useEffect, useState, useCallback } from 'react';
 import { GameCardContainer } from './components/GameCardContainer';
 import { ConnectWalletButton } from './components/ConnectWalletButton';
+import { ChainButton } from './components/ChainButton';
 import {React} from 'react';
 
 import linkABI from './artifacts/@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol/LinkTokenInterface.json';
@@ -15,6 +16,11 @@ import linkABI from './artifacts/@chainlink/contracts/src/v0.8/interfaces/LinkTo
 //   linkABI.abi
 // );
 
+const supportedChains = new Set([
+  '0x13881', '80001', //Mumbai Testnet
+]);
+
+
 function isMetaMaskInstalled() {
   return Boolean(window.ethereum && window.ethereum.isMetaMask);
 }
@@ -24,11 +30,14 @@ async function getAccounts() {
   return await window.ethereum.request({method: 'eth_accounts'});
 }
 
+
+
 function App() {
 
   const [balance, setBalance] = useState('0');
   const [accountAddress, setAccountAddress] = useState('0x');
   const [connectionButtonText, setConnectionButtonText] = useState('');
+  const [connectionStatusText, setConnectionStatusText] = useState('');
   const [isInstalled, setIsInstalled] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   // const [linkBalance, setLinkBalance] = useState('0');
@@ -55,7 +64,7 @@ function App() {
   async function getConnectionInfo() {
     const installed = isMetaMaskInstalled();
     setIsInstalled(installed);
-    setConnectionButtonText(installed ? 'Connect to MetaMask' : 'Install MetaMask!');
+    setConnectionButtonText('Connect to MetaMask');
     if (!installed) return;
     try {
       getAccounts().then((res) => {
@@ -63,6 +72,11 @@ function App() {
           setIsConnected(true);
           setAccountAddress(res[0]);
           setConnectionButtonText(res[0]);
+          if (supportedChains.has(window.ethereum.networkVersion)) {
+            setConnectionStatusText('');
+          } else {
+            setConnectionStatusText(`Note: You are on an unsupported network. Please switch to Polygon Mumbai Testnet.`);
+          }
         }
       });
     } catch (e) {
@@ -73,7 +87,6 @@ function App() {
   async function connectWallet() {
 
     try {
-      console.log("here")
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
         params: [{chainId: '0x13881'}] //Chain ID of Mumbai in hex
@@ -88,13 +101,16 @@ function App() {
               {
                 chainId: '0x13881',
                 chainName: 'Mumbai Testnet',
+                nativeCurrency: {
+                  symbol: 'MATIC',
+                  decimals: 18,
+                },
                 rpcUrls: ['https://rpc-mumbai.maticvigil.com'],
               },
             ],
           });
         } catch (addError) {
           // Do stuff
-          console.log('what')
         }
       }
       else {
@@ -108,6 +124,7 @@ function App() {
       setIsConnected(true);
       setAccountAddress(res[0])
       setConnectionButtonText(res[0]);
+      setConnectionStatusText('')
     });
 
 
@@ -115,6 +132,7 @@ function App() {
 
   function connectionButtonOnClick() {
     if (!isInstalled) {
+      setConnectionStatusText('Please refresh the page once MetaMask installation has finished.')
       return window.open("https://metamask.io/");
     }
     if (!isConnected) {
@@ -179,16 +197,37 @@ function App() {
           setGames(oldArray => updated);
 
         }, 101);
-    };
+    }
+
+    function handleAccountChange() {
+      setIsConnected(false);
+      getConnectionInfo();
+    }
+
+    function handleChainChange(_chainId) {
+      if (!supportedChains.has(_chainId)) {
+        setConnectionStatusText(`Note: You are on an unsupported network. Please switch to Polygon Mumbai Testnet.`);
+      } else {
+        setConnectionStatusText('');
+      }
+    }
+
 
     window.addEventListener("resize", moveCards);
 
     if (isMetaMaskInstalled()) {
-      window.ethereum.on('accountsChanged', () => {
-        setIsConnected(false);
-        getConnectionInfo();
-      });
+      window.ethereum.on('accountsChanged', handleAccountChange);
+      window.ethereum.on('chainChanged', handleChainChange);
     }
+
+    return () => {
+      window.removeEventListener('resize', moveCards);
+      if (isMetaMaskInstalled()) {
+        window.ethereum.removeListener('accountsChanged', handleAccountChange);
+        window.ethereum.removeListener('chainChanged', handleChainChange);
+      }
+    };
+
   })
 
 
@@ -197,6 +236,9 @@ function App() {
       className="App"
     >
       <div className="header">
+        <div style={{fontSize: "40px", marginRight: "40px"}}>
+          {connectionStatusText}
+        </div>
         <ConnectWalletButton 
           clickHandler={connectionButtonOnClick}
           text={connectionButtonText}
