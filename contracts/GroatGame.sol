@@ -45,8 +45,8 @@ contract GroatGame is VRFConsumerBase {
     {
         require(_stake > 0, "Stake must be non-zero.");
         require(_max_players > 0, "Max players must be non-zero.");
-        require(link_fee % _max_players == 0, "LINK fee should be divided evenly.");
-        require(stake % _max_players == 0, "Stake should be divided evenly.");
+        require(link_fee % (_max_players - 1) == 0, "LINK fee should be divided evenly.");
+        require(stake % (_max_players - 1) == 0, "Stake should be divided evenly.");
 
         stake = _stake;
         max_players = _max_players;

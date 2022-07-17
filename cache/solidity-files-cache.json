@@ -74,8 +74,8 @@
       ]
     },
     "/home/tmisirpash/Desktop/scapegroat/contracts/GroatGame.sol": {
-      "lastModificationDate": 1657071346462,
-      "contentHash": "32a197693d7dc7a8febb95d37561d2db",
+      "lastModificationDate": 1658021274026,
+      "contentHash": "d5362a83b64d079df0e9628eb3342e1a",
       "sourceName": "contracts/GroatGame.sol",
       "solcConfig": {
         "version": "0.8.4",
