@@ -8,7 +8,7 @@ import { ChainButton } from './components/ChainButton';
 import {React} from 'react';
 
 import linkABI from './artifacts/@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol/LinkTokenInterface.json';
-
+import groatABI from './artifacts/contracts/GroatGame.sol/GroatGame.json';
 
 //const provider = ethers.providers.Web3Provider(window.ethereum, "any");
 // const link_contract = new ethers.Contract(
@@ -28,6 +28,20 @@ function isMetaMaskInstalled() {
 
 async function getAccounts() {
   return await window.ethereum.request({method: 'eth_accounts'});
+}
+
+
+async function getGroatData() {
+  const groatContract = new ethers.Contract(
+    '0x7fb8E70064B943B62BB2Cb47b093f4F25CCb5036',
+    groatABI.abi,
+    new ethers.providers.Web3Provider(window.ethereum)
+  );
+  const max_players = await groatContract.max_players();
+  const stake = await groatContract.stake();
+
+  console.log(max_players.toString());
+  console.log(stake.toString());
 }
 
 
@@ -64,7 +78,7 @@ function App() {
   async function getConnectionInfo() {
     const installed = isMetaMaskInstalled();
     setIsInstalled(installed);
-    setConnectionButtonText('Connect to MetaMask');
+    setConnectionButtonText('Connect with MetaMask');
     if (!installed) return;
     try {
       getAccounts().then((res) => {
@@ -126,6 +140,7 @@ function App() {
       setConnectionButtonText(res[0]);
       setConnectionStatusText('')
     });
+
 
 
   }
@@ -212,7 +227,7 @@ function App() {
       }
     }
 
-
+   
     window.addEventListener("resize", moveCards);
 
     if (isMetaMaskInstalled()) {
