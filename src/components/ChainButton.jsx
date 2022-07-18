@@ -10,14 +10,14 @@ export function ChainButton(props) {
     return (
         <div className='chain-button'>
             {'Blah'}
-            <img 
+            {/* <img 
                 src={require('../images/arrow-icon-down.png')} 
                 height={50} 
                 width={50} 
                 style={{
                     float: "right"
                 }}
-            ></img>
+            ></img> */}
         </div>
     );
 }
