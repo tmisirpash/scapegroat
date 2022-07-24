@@ -10,6 +10,9 @@ import {React} from 'react';
 import linkABI from './artifacts/@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol/LinkTokenInterface.json';
 import groatABI from './artifacts/contracts/GroatGame.sol/GroatGame.json';
 
+
+const groatAddress = '0x8BE9A57B08Bf2c09197c03240829BC5026E8cb0e';
+
 //const provider = ethers.providers.Web3Provider(window.ethereum, "any");
 // const link_contract = new ethers.Contract(
 //   0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266,
@@ -31,17 +34,59 @@ async function getAccounts() {
 }
 
 
-async function getGroatData() {
-  const groatContract = new ethers.Contract(
-    '0x7fb8E70064B943B62BB2Cb47b093f4F25CCb5036',
-    groatABI.abi,
-    new ethers.providers.Web3Provider(window.ethereum)
-  );
-  const max_players = await groatContract.max_players();
-  const stake = await groatContract.stake();
+async function getGroatData(address) {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const groatContract = new ethers.Contract(
+        groatAddress,
+        groatABI.abi,
+        provider
+    );
+    const groatWithSigner = groatContract.connect(signer);
 
-  console.log(max_players.toString());
-  console.log(stake.toString());
+
+    const linkContract = new ethers.Contract(
+        '0x326C977E6efc84E512bB9C30f76E30c160eD06FB',
+        linkABI.abi,
+        provider
+    );
+    const linkContractWithSigner = linkContract.connect(signer);
+
+    const balanceOfGroatEth = await provider.getBalance(groatAddress);
+    console.log('contract eth balance', balanceOfGroatEth.toString());
+    const balanceOfGroatLink = await linkContract.balanceOf(groatAddress);
+    console.log('contract link balance', balanceOfGroatLink.toString());
+
+
+    const ethInContract = await groatContract.staked_eth(address);
+    console.log('staked eth', ethers.utils.formatEther(ethInContract));
+    const linkInContract = await groatContract.staked_link(address);
+    console.log('staked link', ethers.utils.formatEther(linkInContract));
+    const numEntries = await groatContract.num_entries(address);
+    console.log('number of entries', numEntries.toString());
+    const idEntries = await groatContract.id_entries(0);
+    idEntries.forEach((e) => console.log(e));
+    const playerEntries = await groatContract.id_player_entries(address, 0);
+    playerEntries.forEach((e) => console.log(e));
+
+
+    // const tx = groatWithSigner.depositEth({
+    //   value: ethers.utils.parseEther('0.001')
+    // });
+ 
+    // const tx = groatWithSigner.removeLinkEth(
+    //   ethers.utils.parseEther('0'),
+    //   ethers.utils.parseEther('0.001')
+    // );
+    //console.log(tx);
+
+
+
+        // const tx = linkContractWithSigner.transferAndCall(
+        //     groatAddress,
+        //     ethers.utils.parseEther('0.00015'),
+        //     []
+        // );
 }
 
 
@@ -85,6 +130,7 @@ function App() {
         if (res && res.length > 0) {
           setIsConnected(true);
           setAccountAddress(res[0]);
+          getGroatData(res[0]);
           setConnectionButtonText(res[0]);
           if (supportedChains.has(window.ethereum.networkVersion)) {
             setConnectionStatusText('');

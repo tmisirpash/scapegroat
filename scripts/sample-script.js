@@ -16,8 +16,8 @@ async function main() {
   // We get the contract to deploy
   const GroatGame = await hre.ethers.getContractFactory("GroatGame");
   const groatgame = await GroatGame.deploy(
-    "2000000000000000000",
-    "201"
+    hre.ethers.utils.parseEther('0.002'),
+    "3"
   );
 
   await groatgame.deployed();

@@ -7,11 +7,13 @@ contract GroatGame is VRFConsumerBase {
     uint256 public stake; //Amount of ETH each player needs to stake.
     uint256 public max_players; //Maximum number of players.
     uint256 public entrance_fee; //Amount of LINK each player needs to add.
-    uint256 public link_fee = 0.25 * 10 ** 18; //Amount of LINK needed to request a random number.
+    uint256 public link_fee = 0.0001 * 10 ** 18; //Amount of LINK needed to request a random number.
     uint256 public payout;
 
-    mapping(address => uint256) staked_eth; //Mapping from address to the amount of ETH the address has in the contract.
-    mapping(address => uint256) staked_link; //Mapping from address to the amount of LINK the address has in the contract.
+    mapping(address => bool) public known_player; 
+
+    mapping(address => uint256) public staked_eth; //Mapping from address to the amount of ETH the address has in the contract.
+    mapping(address => uint256) public staked_link; //Mapping from address to the amount of LINK the address has in the contract.
 
     //Represents a single entry in the game queue.
     struct Entry {
@@ -25,15 +27,15 @@ contract GroatGame is VRFConsumerBase {
         uint256 next;
     }
 
-    mapping(uint256 => Entry) id_entries; //Used for global queue.
-    uint256 queue_size;
-    uint256 game_end_marker;
+    mapping(uint256 => Entry) public id_entries; //Used for global queue.
+    uint256 public queue_size;
+    uint256 public game_end_marker;
 
-    mapping(address => mapping(uint256 => PlayerEntry)) id_player_entries; //Used for address-level queue.
-    mapping(address => uint256) num_entries; //Mapping from address to the address's number of active entries.
+    mapping(address => mapping(uint256 => PlayerEntry)) public id_player_entries; //Used for address-level queue.
+    mapping(address => uint256) public num_entries; //Mapping from address to the address's number of active entries.
 
-    uint256 head = 0;
-    uint256 tail = type(uint256).max;
+    uint256 public head = 0;
+    uint256 public tail = type(uint256).max;
 
     bytes32 internal keyHash = 0x6e75b569a01ef56d18cab6a8e71e6600d6ce853834d4a5748b720d06f878b3a4;
 
@@ -50,8 +52,8 @@ contract GroatGame is VRFConsumerBase {
 
         stake = _stake;
         max_players = _max_players;
-        entrance_fee = link_fee / max_players;
-        payout = stake + stake / max_players;
+        entrance_fee = link_fee / (max_players - 1);
+        payout = stake + stake / (max_players - 1);
 
 
         id_entries[head] = Entry(head, tail, address(0));
@@ -70,9 +72,10 @@ contract GroatGame is VRFConsumerBase {
     }
 
     function appendToPlayerEntryList(address from, uint256 new_id) private {
-        if (num_entries[from] == 0){
+        if (!known_player[from]){
             id_player_entries[from][head] = PlayerEntry(head, tail);
             id_player_entries[from][tail] = PlayerEntry(head, tail);
+            known_player[from] = true;
         }
         uint256 prev_id = id_player_entries[from][tail].prev;
         id_player_entries[from][new_id] = PlayerEntry(prev_id, tail);
@@ -129,7 +132,7 @@ contract GroatGame is VRFConsumerBase {
             );
             if (queue_size + new_entry_count_in_current_game == max_players) {
                 game_end_marker = id_entries[tail].prev + new_entry_count_in_current_game;
-                //getRandomNumber();
+                getRandomNumber();
             }
         }
         for (uint256 i = 0; i < new_entry_count; i++) {
@@ -163,27 +166,30 @@ contract GroatGame is VRFConsumerBase {
     //able to withdraw the full amount specified; the function will withdraw as much as it can and
     //return the amount of each currency withdrawn.
     function removeLinkEth(uint256 link_amount, uint256 eth_amount) public returns (uint256, uint256) {
+        require(link_amount > 0 || eth_amount > 0, "Should remove non-zero amount.");
         require(staked_link[msg.sender] >= link_amount, "Too much LINK.");
         require(staked_eth[msg.sender] >= eth_amount, "Too much ETH.");
-        require(link_amount > 0 || eth_amount > 0, "Should remove non-zero amount.");
 
-        uint256 link_entries_to_remove = link_amount % entrance_fee == 0 ? link_amount / entrance_fee : link_amount / entrance_fee + 1;
-        uint256 eth_entries_to_remove = eth_amount % stake == 0 ? eth_amount / stake : eth_amount / stake + 1;
-        uint256 entries_being_removed = removeEntries(
-            max(
-                link_entries_to_remove,
-                eth_entries_to_remove
-            )
+
+        uint256 new_desired_link_entries = (staked_link[msg.sender] - link_amount) / entrance_fee;
+        uint256 new_desired_eth_entries = (staked_eth[msg.sender] - eth_amount) / stake;
+        uint256 new_desired_entries = min(
+            new_desired_link_entries,
+            new_desired_eth_entries
         );
+        uint256 desired_entry_difference = num_entries[msg.sender] - new_desired_entries;
 
-        uint256 link_amount_to_transfer = link_entries_to_remove <= entries_being_removed ? link_amount : link_amount - (entrance_fee * (link_entries_to_remove - entries_being_removed));
-        uint256 eth_amount_to_transfer = eth_entries_to_remove <= entries_being_removed ? eth_amount : eth_amount - (stake * (eth_entries_to_remove - entries_being_removed));
+        if (desired_entry_difference != 0) removeEntries(desired_entry_difference);
+
+        //num_entries has been updated.
+        uint256 link_amount_to_transfer = num_entries[msg.sender] <= new_desired_link_entries ? link_amount : link_amount - (entrance_fee * (num_entries[msg.sender] - new_desired_link_entries));
+        uint256 eth_amount_to_transfer = num_entries[msg.sender] <= new_desired_eth_entries ? eth_amount : eth_amount - (stake * (num_entries[msg.sender] - new_desired_eth_entries));
 
         staked_link[msg.sender] -= link_amount_to_transfer;
         staked_eth[msg.sender] -= eth_amount_to_transfer;
 
-        //LINK.transfer(msg.sender, link_amount_to_transfer);
-        //payable(msg.sender).transfer(eth_amount_to_transfer);
+        LINK.transfer(msg.sender, link_amount_to_transfer);
+        payable(msg.sender).transfer(eth_amount_to_transfer);
 
         return (link_amount_to_transfer, eth_amount_to_transfer);
 
